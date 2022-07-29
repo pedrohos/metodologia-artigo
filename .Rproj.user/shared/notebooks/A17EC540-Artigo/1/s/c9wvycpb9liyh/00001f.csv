@@ -1,0 +1,3 @@
+"0","barplot(prop.table(table(df$RemotoEstimulouAprendizado)) * 100,"
+"0","        ylab = ""Ensino remoto estimulou o aprendizado"", xlab = ""Frequência Relativa (%)"","
+"0","        horiz = TRUE, xlim = c(0, 100), col = rainbow(5))"

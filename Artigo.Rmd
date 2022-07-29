@@ -1,0 +1,156 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r message=FALSE, warning=FALSE}
+# IMPORTS
+if(!require(dplyr)) install.packages("dplyr")
+library(dplyr)
+if(!require(RVAideMemoire)) install.packages("RVAideMemoire")
+library(RVAideMemoire)
+if(!require(car)) install.packages("car")
+library(car)
+if(!require(psych)) install.packages("psych")
+library(psych)
+if(!require(rstatix)) install.packages("rstatix")
+library(rstatix)
+if(!require(corrplot)) install.packages("corrplot")
+library(corrplot)
+if(!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+```
+
+```{r}
+# CARREGAMENTO
+set.seed(42)
+
+# Removendo colunas e linhas desnecessários
+df_raw = read.csv('respostas_form_23_07_2022.csv', fileEncoding = "UTF-8")
+remove_part_idx = which(df_raw["Você.cursou.disciplinas.no.formato.presencial.ANTES.da.pandemia.do.COVID.19."] == "Não")
+df_no_part = df_raw[-c(remove_part_idx),]
+
+# Removendo colunas desnenecesárias
+df_filter_row_col = df_no_part[,-c(1,2,3,4)] # Remove datatime and consent afirmation
+
+# Renomeando colunas
+df = setNames(df_filter_row_col, c("RemotoEstimulouAprendizado", "NotaCondizAprendizado", "RemotoImpactoPositivo", "RemotoCRAAumentou.non_disc", "ImpactoMotivacaoCurso", "ImpactoDificuldadeLugarCalmo", "ImpactoRespDomesticas", "ImpactoEncontrarAjuda", "ImpactoMalestar", "ImpactoNovasRespFinanceiras", "ImpactoConectividade", "ImpactoComputador", "ImpactoMetodologiaProf"))
+
+# Discretizando escala likert nos dados
+df$RemotoCRAAumentou = ifelse(df$RemotoCRAAumentou.non_disc == "Sim", 1, 0)
+df[df=="Nenhum Impacto"] = 1
+df[df=="Impacto Baixo"] = 2
+df[df=="Impacto Médio"] = 3
+df[df=="Impacto Alto"] = 4
+df[df=="Impacto Altíssimo"] = 5
+```
+
+```{r}
+#Análise dos dados
+
+median(df$RemotoEstimulouAprendizado)
+```
+
+```{r}
+boxplot(df$RemotoEstimulouAprendizado)
+```
+```{r}
+mode(df$RemotoEstimulouAprendizado)
+```
+# USAR QUIQUADRADO PARA CRA AUMENTOU  
+
+```{r}
+barplot(prop.table(table(df$RemotoEstimulouAprendizado)) * 100,
+        ylab = "Ensino remoto estimulou o aprendizado", xlab = "Frequência Relativa (%)",
+        horiz = TRUE, xlim = c(0, 100), col = rainbow(5))
+
+#ggplot(df$RemotoCRAAumentou.non_disc)
+```
+```{r}
+#Análise da coluna "RemotoEstimulouAprendizado"
+summary(df$RemotoEstimulouAprendizado)
+```
+
+```{r}
+wilcox.test(df$RemotoEstimulouAprendizado, alternative = c("greater"),
+            mu = 3, conf.level = 0.95)
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+barplot(prop.table(table(df$NotaCondizAprendizado)) * 100,
+        ylab = "Notas foram condizentes com o aprendizado", xlab = "Frequência Relativa (%)",
+        horiz = TRUE, xlim = c(0, 100), col = rainbow(5))
+```
+
+```{r}
+#Análise da coluna "RemotoEstimulouAprendizado"
+summary(df$NotaCondizAprendizado)
+# Comentar no artigo: as notas não afetaram negativamente nem positivamente o aprendizado
+# dado que a mediana foi 3 (neutro).
+```
+
+```{r}
+barplot(prop.table(table(df$RemotoImpactoPositivo)) * 100,
+        ylab = "O ensino remoto impactou positivamente no aprendizado", xlab = "Frequência Relativa (%)",
+        horiz = TRUE, xlim = c(0, 100), col = rainbow(5))
+```
+```{r}
+tabela_impactoPositivo_aprendizadoEstimulado = table(df$RemotoImpactoPositivo, df$RemotoEstimulouAprendizado)
+
+quiqua2 = chisq.test(tabela_impactoPositivo_aprendizadoEstimulado, simulate.p.value = TRUE)
+quiqua2
+```
+```{r}
+quiqua2$expected
+```
+
+```{r}
+corrplot(quiqua2$stdres, is.cor = FALSE,
+          method = "color",
+          tl.col="black", tl.srt=0) # Indícios de relação linear entre o sentir-se estimulado no ensino remoto e o o aprendizado ser impactado positivamente
+```
+
+```{r}
+```
+
+
+```{r}
+#Análise da coluna "RemotoEstimulouAprendizado"
+summary(df$RemotoImpactoPositivo)
+# Comentar no artigo: as notas não afetaram negativamente nem positivamente o aprendizado
+# dado que a mediana foi 3 (neutro).
+```
+
+```{r}
+barplot(prop.table(table(df$RemotoCRAAumentou.non_disc)) * 100,
+        ylab = "CRA Aumentou durante o período remoto", xlab = "Frequência Relativa (%)",
+        horiz = TRUE, xlim = c(0, 100), col = rainbow(2))
+
+#ggplot(df$RemotoCRAAumentou.non_disc)
+```
+
+```{r}
+table(df$RemotoCRAAumentou.non_disc)
+```
+
+```{r}
+cra_aumentou_idx = which(df$RemotoCRAAumentou == 1)
+galera_cra_aumentou = df[c(cra_aumentou_idx),]
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

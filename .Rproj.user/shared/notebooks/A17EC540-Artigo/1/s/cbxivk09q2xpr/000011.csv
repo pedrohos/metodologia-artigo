@@ -1,0 +1,3 @@
+"0","corrplot(quiqua2$stdres, is.cor = FALSE,"
+"0","          method = ""color"","
+"0","          tl.col=""black"", tl.srt=0) # Indícios de relação linear entre o sentir-se estimulado no ensino remoto e o o aprendizado ser impactado positivamente"
